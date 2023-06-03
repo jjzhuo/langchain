@@ -143,7 +143,7 @@ Bye!\n\n-H."""
     output = splitter.split_text(text)
     expected_output = [
         "Hi.\n\nI'm",
-        " Harrison.",
+        "Harrison.",
         "How?",
         "Are? You?",
         "Okay then",
@@ -154,7 +154,7 @@ Bye!\n\n-H."""
         "write,",
         "but gotta",
         "test the",
-        " splitting",
+        "splitting",
         "ggg some",
         "how.",
         "Bye!",
@@ -256,7 +256,7 @@ func main() {
         'import "fmt"',
         "func",
         "helloWorld() {",
-        '\nfmt.Println("He',
+        'fmt.Println("He',
         'llo, World!")\n}',
         "func main() {",
         "helloWorld()\n}",
@@ -286,7 +286,7 @@ Lists
     chunks = splitter.split_text(code)
     assert chunks == [
         "Sample Document",
-        "\n===============",
+        "===============",
         "Section",
         "-------\n\nThis",
         "is the content",
@@ -344,7 +344,7 @@ helloWorld();
     assert chunks == [
         "function",
         "helloWorld() {",
-        '\nconsole.log("He',
+        'console.log("He',
         'llo, World!");\n}',
         "// Call the",
         "function",
@@ -371,7 +371,7 @@ public class HelloWorld {
         "void",
         "main(String[]",
         "args) {",
-        "\nSystem.out.prin",
+        "System.out.prin",
         'tln("Hello,',
         'World!");\n}\n}',
     ]
@@ -417,9 +417,9 @@ object HelloWorld {
         "object",
         "HelloWorld {",
         "def main(args:",
-        " Array[String]):",
+        "Array[String]):",
         "Unit = {",
-        '\nprintln("Hello,',
+        'println("Hello,',
         'World!")\n}\n}',
     ]
 
@@ -501,5 +501,5 @@ fn main() {
     chunks = splitter.split_text(code)
     assert chunks == [
         'fn main() {',
-        '\nprintln!("Hello',
+        'println!("Hello',
         ', World!");\n}']

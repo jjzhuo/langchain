@@ -172,7 +172,7 @@ class TextSplitter(BaseDocumentTransformer, ABC):
             total += _len + (separator_len if len(current_doc) > 1 else 0)
         doc = self._join_docs(current_doc, separator)
         if doc is not None:
-            docs.append(doc.strip())
+            docs.append(doc)
         return docs
 
     @classmethod
@@ -355,23 +355,12 @@ class RecursiveCharacterTextSplitter(TextSplitter):
 
     def _split_text(self, text: str, separators: List[str]) -> List[str]:
         """Split incoming text and return chunks."""
-        final_chunks = []
-        # Get appropriate separator to use
-        separator = separators[-1]
-        new_separators = None
-        for i, _s in enumerate(separators):
-            if _s == "":
-                separator = _s
-                break
-            if _s in text:
-                separator = _s
-                new_separators = separators[i + 1 :]
-                break
-
+        # First split the text recursively
         splits = _recursive_split_text(text, separators, self._chunk_size)
-        # Now go merging things, recursively splitting longer texts.
+        # Now go merging things greedily
+        final_chunks = []
         _good_splits = []
-        _separator = "" if self._keep_separator else separator
+        _separator = "" if self._keep_separator else separators[0]
         for s in splits:
             if self._length_function(s) < self._chunk_size:
                 _good_splits.append(s)
@@ -380,11 +369,7 @@ class RecursiveCharacterTextSplitter(TextSplitter):
                     merged_text = self._merge_splits(_good_splits, _separator)
                     final_chunks.extend(merged_text)
                     _good_splits = []
-                if new_separators is None:
-                    final_chunks.append(s)
-                else:
-                    other_info = self._split_text(s, new_separators)
-                    final_chunks.extend(other_info)
+                final_chunks.append(s.strip())
         if _good_splits:
             merged_text = self._merge_splits(_good_splits, _separator)
             final_chunks.extend(merged_text)

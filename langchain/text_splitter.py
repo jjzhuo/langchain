@@ -35,7 +35,7 @@ def _split_text(text: str, separator: str, keep_separator: bool) -> List[str]:
         if keep_separator:
             # The parentheses in the pattern keep the delimiters in the result.
             _splits = re.split(f"({separator})", text)
-            splits = [_splits[i] + _splits[i + 1] for i in range(1, len(_splits), 2)]
+            splits = [_splits[i] + _splits[i + 1].strip() for i in range(1, len(_splits), 2)]
             if len(_splits) % 2 == 0:
                 splits += _splits[-1:]
             splits = [_splits[0]] + splits
@@ -147,7 +147,7 @@ class TextSplitter(BaseDocumentTransformer, ABC):
             total += _len + (separator_len if len(current_doc) > 1 else 0)
         doc = self._join_docs(current_doc, separator)
         if doc is not None:
-            docs.append(doc)
+            docs.append(doc.strip())
         return docs
 
     @classmethod
@@ -328,6 +328,30 @@ class RecursiveCharacterTextSplitter(TextSplitter):
         super().__init__(keep_separator=keep_separator, **kwargs)
         self._separators = separators or ["\n\n", "\n", " ", ""]
 
+    def _split_text_to_chunks_within_size(self, text: str, separators: list[str], keep_separator=True) -> list[str]:
+        chunks = []
+        for separator in separators:
+            if separator == "":
+                chunks = [text[i:i+self._chunk_size] for i in range(0, len(text), self._chunk_size)]
+                break
+            elif separator in text:
+                chunks = _split_text(text, separator, keep_separator)
+                break
+        print(f"Splitting {text} with separator: {separator}")
+        print(chunks)
+        if any(["splittingggg" == chunk.strip() for chunk in chunks]):
+            print("found consec ws")
+        # Further split chunks if they are too large
+        final_chunks = []
+        for chunk in chunks:
+            if len(chunk) > self._chunk_size:
+                remaining_separators = separators[separators.index(separator)+1:]
+                final_chunks.extend(self._split_text_to_chunks_within_size(chunk, remaining_separators))
+            else:
+                final_chunks.append(chunk)
+            
+        return final_chunks
+
     def _split_text(self, text: str, separators: List[str]) -> List[str]:
         """Split incoming text and return chunks."""
         final_chunks = []
@@ -343,7 +367,9 @@ class RecursiveCharacterTextSplitter(TextSplitter):
                 new_separators = separators[i + 1 :]
                 break
 
-        splits = _split_text(text, separator, self._keep_separator)
+        # splits = _split_text(text, separator, self._keep_separator)
+        splits = self._split_text_to_chunks_within_size(text, separators)
+        # import pdb;pdb.set_trace()
         # Now go merging things, recursively splitting longer texts.
         _good_splits = []
         _separator = "" if self._keep_separator else separator

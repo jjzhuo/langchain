@@ -142,11 +142,10 @@ Bye!\n\n-H."""
     splitter = RecursiveCharacterTextSplitter(chunk_size=10, chunk_overlap=1)
     output = splitter.split_text(text)
     expected_output = [
-        "Hi.",
-        "I'm",
-        "Harrison.",
-        "How? Are?",
-        "You?",
+        "Hi.\n\nI'm",
+        " Harrison.",
+        "How?",
+        "Are? You?",
         "Okay then",
         "f f f f.",
         "This is a",
@@ -155,13 +154,24 @@ Bye!\n\n-H."""
         "write,",
         "but gotta",
         "test the",
-        "splitting",
-        "gggg",
-        "some how.",
+        " splitting",
+        "ggg some",
+        "how.",
         "Bye!",
         "-H.",
     ]
     assert output == expected_output
+
+# def test_iterative_text_splitter2() -> None:
+#     """Test iterative text splitter."""
+#     text = """Hi.\n\nI'm Harrison.\n\nHow? Are? You?\nOkay then f f f f.
+# This is a weird text to write, but gotta test the splittingggg some how.
+
+# Bye!\n\n-H."""
+#     splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=1)
+#     output = splitter.split_text(text)
+#     print(output)
+#     assert output == [text]
 
 
 def test_split_documents() -> None:
@@ -216,8 +226,8 @@ hello_world()
         "def",
         "hello_world():",
         'print("Hello,',
-        'World!")',
-        "# Call the",
+        'World!")\n\n#',
+        "Call the",
         "function",
         "hello_world()",
     ]
@@ -246,13 +256,10 @@ func main() {
         'import "fmt"',
         "func",
         "helloWorld() {",
-        'fmt.Println("He',
-        "llo,",
-        'World!")',
-        "}",
+        '\nfmt.Println("He',
+        'llo, World!")\n}',
         "func main() {",
-        "helloWorld()",
-        "}",
+        "helloWorld()\n}",
     ]
 
 
@@ -279,12 +286,11 @@ Lists
     chunks = splitter.split_text(code)
     assert chunks == [
         "Sample Document",
-        "===============",
+        "\n===============",
         "Section",
-        "-------",
-        "This is the",
-        "content of the",
-        "section.",
+        "-------\n\nThis",
+        "is the content",
+        "of the section.",
         "Lists\n-----",
         "- Item 1",
         "- Item 2",
@@ -314,15 +320,11 @@ message Person {
         "package",
         "example;",
         "message Person",
-        "{",
-        "string name",
-        "= 1;",
-        "int32 age =",
-        "2;",
-        "repeated",
-        "string hobbies",
-        "= 3;",
-        "}",
+        "{\nstring name =",
+        "1;",
+        "int32 age = 2;",
+        "repeated string",
+        "hobbies = 3;\n}"
     ]
 
 
@@ -342,10 +344,8 @@ helloWorld();
     assert chunks == [
         "function",
         "helloWorld() {",
-        'console.log("He',
-        "llo,",
-        'World!");',
-        "}",
+        '\nconsole.log("He',
+        'llo, World!");\n}',
         "// Call the",
         "function",
         "helloWorld();",
@@ -367,14 +367,13 @@ public class HelloWorld {
     assert chunks == [
         "public class",
         "HelloWorld {",
-        "public",
-        "static void",
+        "public static",
+        "void",
         "main(String[]",
         "args) {",
-        "System.out.prin",
+        "\nSystem.out.prin",
         'tln("Hello,',
-        'World!");',
-        "}\n}",
+        'World!");\n}\n}',
     ]
 
 
@@ -395,10 +394,9 @@ int main() {
         "#include",
         "<iostream>",
         "int main() {",
-        "std::cout",
-        '<< "Hello,',
-        'World!" <<',
-        "std::endl;",
+        "std::cout <<",
+        '"Hello, World!"',
+        "<< std::endl;",
         "return 0;\n}",
     ]
 
@@ -418,13 +416,11 @@ object HelloWorld {
     assert chunks == [
         "object",
         "HelloWorld {",
-        "def",
-        "main(args:",
-        "Array[String]):",
+        "def main(args:",
+        " Array[String]):",
         "Unit = {",
-        'println("Hello,',
-        'World!")',
-        "}\n}",
+        '\nprintln("Hello,',
+        'World!")\n}\n}',
     ]
 
 
@@ -443,8 +439,7 @@ hello_world
     assert chunks == [
         "def hello_world",
         'puts "Hello,',
-        'World!"',
-        "end",
+        'World!"\nend',
         "hello_world",
     ]
 
@@ -464,13 +459,10 @@ hello_world();
     """
     chunks = splitter.split_text(code)
     assert chunks == [
-        "<?php",
-        "function",
+        "<?php\nfunction",
         "hello_world() {",
-        "echo",
-        '"Hello,',
-        'World!";',
-        "}",
+        'echo "Hello,',
+        'World!";\n}',
         "hello_world();",
         "?>",
     ]
@@ -492,8 +484,7 @@ helloWorld()
         "func",
         "helloWorld() {",
         'print("Hello,',
-        'World!")',
-        "}",
+        'World!")\n}',
         "helloWorld()",
     ]
 
@@ -507,5 +498,11 @@ fn main() {
     println!("Hello, World!");
 }
     """
+    # pre_slipts = splitter._split_text_to_chunks_within_size(code, separators=["\n", ",", " "])
+    # print(pre_slipts)
+    
     chunks = splitter.split_text(code)
-    assert chunks == ["fn main() {", 'println!("Hello', ",", 'World!");', "}"]
+    assert chunks == [
+        'fn main() {',
+        '\nprintln!("Hello',
+        ', World!");\n}']

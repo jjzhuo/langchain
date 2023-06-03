@@ -162,17 +162,17 @@ Bye!\n\n-H."""
     ]
     assert output == expected_output
 
-# def test_iterative_text_splitter2() -> None:
-#     """Test iterative text splitter."""
-#     text = """Hi.\n\nI'm Harrison.\n\nHow? Are? You?\nOkay then f f f f.
-# This is a weird text to write, but gotta test the splittingggg some how.
+def test_iterative_text_splitter_large_chunks() -> None:
+    """Test iterative text splitter."""
+    text = """Hi.\n\nI'm Harrison.\n\nHow? Are? You?\nOkay then f f f f.
+This is a weird text to write, but gotta test the splittingggg some how.
 
-# Bye!\n\n-H."""
-#     splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=1)
-#     output = splitter.split_text(text)
-#     print(output)
-#     assert output == [text]
-
+Bye!\n\n-H."""
+    splitter = RecursiveCharacterTextSplitter(chunk_size=100, chunk_overlap=1)
+    output = splitter.split_text(text)
+    assert output == [
+        "Hi.\n\nI'm Harrison.\n\nHow? Are? You?\nOkay then f f f f.",
+        'This is a weird text to write, but gotta test the splittingggg some how.\n\nBye!\n\n-H.']
 
 def test_split_documents() -> None:
     """Test split_documents."""
@@ -498,9 +498,6 @@ fn main() {
     println!("Hello, World!");
 }
     """
-    # pre_slipts = splitter._split_text_to_chunks_within_size(code, separators=["\n", ",", " "])
-    # print(pre_slipts)
-    
     chunks = splitter.split_text(code)
     assert chunks == [
         'fn main() {',

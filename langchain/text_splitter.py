@@ -358,22 +358,7 @@ class RecursiveCharacterTextSplitter(TextSplitter):
         # First split the text recursively
         splits = _recursive_split_text(text, separators, self._chunk_size)
         # Now go merging things greedily
-        final_chunks = []
-        _good_splits = []
-        _separator = "" if self._keep_separator else separators[0]
-        for s in splits:
-            if self._length_function(s) < self._chunk_size:
-                _good_splits.append(s)
-            else:
-                if _good_splits:
-                    merged_text = self._merge_splits(_good_splits, _separator)
-                    final_chunks.extend(merged_text)
-                    _good_splits = []
-                final_chunks.append(s.strip())
-        if _good_splits:
-            merged_text = self._merge_splits(_good_splits, _separator)
-            final_chunks.extend(merged_text)
-        return final_chunks
+        return self._merge_splits(splits, "")
 
     def split_text(self, text: str) -> List[str]:
         return self._split_text(text, self._separators)
